@@ -6,6 +6,7 @@
 #define EPOCH                 200
 #define LOOP_FOR_TRAIN        (60000 / BATCH)
 #define LOOP_FOR_GENERATE     (10000 / BATCH)
+#define LOOP_FOR_TRAIN_DISC   5
 #define GPUID                 1
 
 using namespace std;
@@ -72,9 +73,11 @@ int main(int argc, char const *argv[]) {
             x_t->SetDeviceGPU(GPUID);
             z_t->SetDeviceGPU(GPUID);
 #endif  // __CUDNN__
-            net->FeedInputTensor(2, z_t, x_t);
-            net->ResetParameterGradient();
-            net->TrainDiscriminator();
+            for(int k = 0; k < LOOP_FOR_TRAIN_DISC; k++){
+                net->FeedInputTensor(2, z_t, x_t);
+                net->ResetParameterGradient();
+                net->TrainDiscriminator();
+            }
 
             z_t = Gnoise->GetNoiseFromBuffer();
 
